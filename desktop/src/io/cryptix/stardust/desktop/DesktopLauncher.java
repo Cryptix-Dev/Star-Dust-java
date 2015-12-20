@@ -7,6 +7,9 @@ import io.cryptix.stardust.MainGame;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.title = "Star Dust";
+		config.width = 600;
+		config.height = 600;
 		new LwjglApplication(new MainGame(), config);
 	}
 }
