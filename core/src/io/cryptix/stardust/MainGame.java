@@ -3,9 +3,7 @@ package io.cryptix.stardust;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,19 +13,14 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MainGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	Sprite img;
 	
-	private Viewport viewport;
-	private Camera camera;
+	public PlayerCamera camera;
 	private World world;
 	
 	private Box2DDebugRenderer debugRenderer;
@@ -40,11 +33,12 @@ public class MainGame extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		img = new Sprite(new Texture("badlogic.jpg"));
 		
-		camera = new OrthographicCamera();
-		viewport = new FitViewport(100, 100, camera);
-		camera.update();
+		camera = new PlayerCamera();
 		
-		world = new World(new Vector2(0, -1000f), true);
+		PlayerInput playerInput = new PlayerInput(this);
+		Gdx.input.setInputProcessor(playerInput);
+		
+		world = new World(new Vector2(0, 0f), true);
 		
 		debugRenderer = new Box2DDebugRenderer();
 		
@@ -55,7 +49,7 @@ public class MainGame extends ApplicationAdapter {
 		body = world.createBody(bodyDef);
 		
 		CircleShape circle = new CircleShape();
-		circle.setRadius(6f);
+		circle.setRadius(1.5f);
 		
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = circle;
@@ -65,15 +59,16 @@ public class MainGame extends ApplicationAdapter {
 		
 		body.createFixture(fixtureDef);
 		
+		
 		circle.dispose();
 		
-		BodyDef groundBodyDef = new BodyDef();
-		groundBodyDef.position.set(new Vector2(0, -50));
-		Body groundBody = world.createBody(groundBodyDef);
-		PolygonShape groundBox = new PolygonShape();
-		groundBox.setAsBox(100.0f, 10.0f);
-		groundBody.createFixture(groundBox, 0.0f);
-		groundBox.dispose();
+//		BodyDef groundBodyDef = new BodyDef();
+//		groundBodyDef.position.set(new Vector2(0, -20));
+//		Body groundBody = world.createBody(groundBodyDef);
+//		PolygonShape groundBox = new PolygonShape();
+//		groundBox.setAsBox(100.0f, 10.0f);
+//		groundBody.createFixture(groundBox, 0.0f);
+//		groundBox.dispose();
 	}
 	
 	private float accumulator = 0;
@@ -86,34 +81,37 @@ public class MainGame extends ApplicationAdapter {
 		}
 	}
 
+	private Vector2 lastMoveVelocity = new Vector2();
 	@Override
 	public void render () {
+		((PlayerInput)Gdx.input.getInputProcessor()).update();
+		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		Vector2 moveVelocity = new Vector2();
 		if (Gdx.input.isKeyPressed(Keys.A)) {
-			moveVelocity.x += -250f;
+			moveVelocity.x += -25f;
 		}
 		if (Gdx.input.isKeyPressed(Keys.W)) {
-			moveVelocity.y += 50f;
+			moveVelocity.y += 5f;
 		}
 		if (Gdx.input.isKeyPressed(Keys.D)) {
-			moveVelocity.x += 100f;
+			moveVelocity.x += 10f;
 		}
 		if (Gdx.input.isKeyPressed(Keys.S)) {
-			moveVelocity.y += -50f;
+			moveVelocity.y += -5f;
 		}
-		body.setLinearVelocity(body.getLinearVelocity().add(moveVelocity));
-		
+		body.setLinearVelocity(body.getLinearVelocity().add(moveVelocity).mulAdd(lastMoveVelocity, -1));
+		lastMoveVelocity = moveVelocity;
 		camera.update();
 		
-		debugRenderer.render(world, camera.combined);
+		debugRenderer.render(world, camera.getProjViewMatrix());
 		doPhysicsStep(Gdx.graphics.getDeltaTime());
 	}
 	
 	@Override
 	public void resize(int width, int height) {
-		viewport.update(width, height);
+		camera.resize(width, height);
 	}
 }
