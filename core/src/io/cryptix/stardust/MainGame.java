@@ -15,8 +15,10 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -29,7 +31,7 @@ public class MainGame extends ApplicationAdapter {
 	private World world;
 	
 	private Box2DDebugRenderer debugRenderer;
-	public float TIMESTEP = 1/45f;
+	public float TIMESTEP = 1/300f;
 	
 	private Body body;
 	
@@ -39,9 +41,10 @@ public class MainGame extends ApplicationAdapter {
 		img = new Sprite(new Texture("badlogic.jpg"));
 		
 		camera = new OrthographicCamera();
-		viewport = new ScreenViewport(camera);
+		viewport = new FitViewport(100, 100, camera);
+		camera.update();
 		
-		world = new World(new Vector2(0, 0), true);
+		world = new World(new Vector2(0, -1000f), true);
 		
 		debugRenderer = new Box2DDebugRenderer();
 		
@@ -56,13 +59,21 @@ public class MainGame extends ApplicationAdapter {
 		
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = circle;
-		fixtureDef.density = 0.5f;
+		fixtureDef.density = .01f;
 		fixtureDef.friction = 0.4f;
-		fixtureDef.restitution = 0.6f;
+		fixtureDef.restitution = .6f;
 		
 		body.createFixture(fixtureDef);
 		
 		circle.dispose();
+		
+		BodyDef groundBodyDef = new BodyDef();
+		groundBodyDef.position.set(new Vector2(0, -50));
+		Body groundBody = world.createBody(groundBodyDef);
+		PolygonShape groundBox = new PolygonShape();
+		groundBox.setAsBox(100.0f, 10.0f);
+		groundBody.createFixture(groundBox, 0.0f);
+		groundBox.dispose();
 	}
 	
 	private float accumulator = 0;
@@ -82,18 +93,18 @@ public class MainGame extends ApplicationAdapter {
 		
 		Vector2 moveVelocity = new Vector2();
 		if (Gdx.input.isKeyPressed(Keys.A)) {
-			moveVelocity.x += -50f;
+			moveVelocity.x += -250f;
 		}
 		if (Gdx.input.isKeyPressed(Keys.W)) {
 			moveVelocity.y += 50f;
 		}
 		if (Gdx.input.isKeyPressed(Keys.D)) {
-			moveVelocity.x += 50f;
+			moveVelocity.x += 100f;
 		}
 		if (Gdx.input.isKeyPressed(Keys.S)) {
 			moveVelocity.y += -50f;
 		}
-		body.setLinearVelocity(moveVelocity);
+		body.setLinearVelocity(body.getLinearVelocity().add(moveVelocity));
 		
 		camera.update();
 		
