@@ -8,8 +8,8 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Star Dust";
-		config.width = 600;
-		config.height = 600;
+		config.width = 1280;
+		config.height = 720;
 		new LwjglApplication(new MainGame(), config);
 	}
 }
