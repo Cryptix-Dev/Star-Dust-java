@@ -4,24 +4,16 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PlayerInput implements InputProcessor {
 	
-	private final List<Integer> heldKeys;
 	
 	private final MainGame game;
 	
 	public PlayerInput(MainGame game) {
-		heldKeys = new ArrayList<Integer>();
 		this.game = game;
 	}
 	
 	public void update() {
-		for (int key : heldKeys) {
-			keyPressed(key);
-		}
 	}
 	
 	public boolean keyPressed(int keycode) {
@@ -30,9 +22,7 @@ public class PlayerInput implements InputProcessor {
 	}
 	
 	@Override
-	public boolean keyDown(int keycode) {
-		heldKeys.add(keycode);
-		
+	public boolean keyDown(int keycode) {		
 		if (keycode == Keys.W) {
 			game.player.movePlayer(0, 1);
 			return true;
@@ -52,8 +42,6 @@ public class PlayerInput implements InputProcessor {
 
 	@Override
 	public boolean keyUp(int keycode) {
-		heldKeys.remove(heldKeys.lastIndexOf(keycode));
-		
 		if (keycode == Keys.W) {
 			game.player.movePlayer(0, -1);
 			return true;
