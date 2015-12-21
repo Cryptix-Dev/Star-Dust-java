@@ -1,6 +1,5 @@
 package io.cryptix.stardust;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Matrix4;
@@ -14,11 +13,10 @@ public class PlayerCamera {
 	private Viewport viewport;
 	private Camera camera;
 	
-	private float gameScale    = .05f;
-	private float moveDistance = 5f; 
+	private float gameScale    = .03f;
+	private float lerp = 0.1f;
 	
-	private Vector3 offset = new Vector3();
-	private Vector3 position = new Vector3();
+	private Vector3 targetPosition = new Vector3();
 	
 	public PlayerCamera() {
 		camera = new OrthographicCamera();
@@ -27,17 +25,24 @@ public class PlayerCamera {
 	}
 	
 	public void update() {
-		camera.position.set(position.x + offset.x, position.y + offset.y, position.z);
+		Vector3 cPos = camera.position;
+		camera.position.x += (targetPosition.x - cPos.x) * lerp;
+		camera.position.y += (targetPosition.y - cPos.y) * lerp;
 		camera.update();
 	}
 	
-	public void calculateOffset(int mouseX, int mouseY) {
-		offset.x = (((float) mouseX / Gdx.graphics.getWidth()) - .5f) * 2 * moveDistance;
-		offset.y = (.5f - ((float) mouseY / Gdx.graphics.getHeight())) * 2 * moveDistance;
+	public Vector2 project(Vector2 coords) {
+		Vector3 res = camera.project(new Vector3(coords.x, coords.y, 0));
+		return new Vector2(res.x, res.y);
 	}
 	
-	public void setPosition(Vector2 newPos) {
-		position = new Vector3(newPos, 0f);
+	public Vector2 unproject(Vector2 coords) {
+		Vector3 res = camera.unproject(new Vector3(coords.x, coords.y, 0));
+		return new Vector2(res.x, res.y);
+	}
+	
+	public void setTarget(Vector2 newPos) {
+		targetPosition = new Vector3(newPos, 0f);
 	}
 	
 	public Matrix4 getProjViewMatrix() {

@@ -1,6 +1,8 @@
 package io.cryptix.stardust;
 
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,24 +25,54 @@ public class PlayerInput implements InputProcessor {
 	}
 	
 	public boolean keyPressed(int keycode) {
+		
 		return false;
 	}
 	
 	@Override
 	public boolean keyDown(int keycode) {
 		heldKeys.add(keycode);
-		return true;
+		
+		if (keycode == Keys.W) {
+			game.player.movePlayer(0, 1);
+			return true;
+		} else if (keycode == Keys.S) {
+			game.player.movePlayer(0, -1);
+			return true;
+		} else if (keycode == Keys.D) {
+			game.player.movePlayer(1, 0);
+			return true;
+		} else if (keycode == Keys.A) {
+			game.player.movePlayer(-1, 0);
+			return true;
+		}
+		
+		return false;
 	}
 
 	@Override
 	public boolean keyUp(int keycode) {
 		heldKeys.remove(heldKeys.lastIndexOf(keycode));
-		return true;
+		
+		if (keycode == Keys.W) {
+			game.player.movePlayer(0, -1);
+			return true;
+		} else if (keycode == Keys.S) {
+			game.player.movePlayer(0, 1);
+			return true;
+		} else if (keycode == Keys.D) {
+			game.player.movePlayer(-1, 0);
+			return true;
+		} else if (keycode == Keys.A) {
+			game.player.movePlayer(1, 0);
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
-		game.camera.calculateOffset(screenX, screenY);
+		game.player.calculateGunRotation(game.camera.unproject(new Vector2(screenX, screenY)));
 		return true;
 	}
 
