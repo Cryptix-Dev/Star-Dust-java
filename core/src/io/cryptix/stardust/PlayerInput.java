@@ -75,18 +75,24 @@ public class PlayerInput implements InputProcessor {
 		game.player.calculateGunRotation(game.camera.unproject(new Vector2(screenX, screenY)));
 		return true;
 	}
+	
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		game.player.calculateGunRotation(game.camera.unproject(new Vector2(screenX, screenY)));
+		return true;
+	}
+
+	
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
 
 	@Override
 	public boolean keyTyped(char character) { return false; }
 
 	@Override
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) { return false; }
-
-	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) { return false; }
-
-	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
 
 	@Override
 	public boolean scrolled(int amount) { return false; }
