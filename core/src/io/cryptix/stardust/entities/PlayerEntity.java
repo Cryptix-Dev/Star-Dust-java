@@ -66,9 +66,10 @@ public class PlayerEntity extends Entity {
 
 	@Override
 	public void update() {
-		gunPos = new Vector2(getPosition().x + .9f, getPosition().y);
+		gunPos = new Vector2(getPosition().x + .9f, getPosition().y - .3f);
 		if (gunRotation >= 90 && gunRotation <= 270) flip = true; else flip = false;
 		
+		// TODO: Check if can move.
 		Vector2 moveVel = new Vector2(direction.x * velocity, direction.y * velocity); 
 		body.setLinearVelocity(body.getLinearVelocity().add(moveVel).mulAdd(lastMoveVel, -1));
 		lastMoveVel = moveVel;
@@ -76,11 +77,11 @@ public class PlayerEntity extends Entity {
 
 	@Override
 	public void render(GameRenderer batch) {
-		if (gunRotation < 25 || gunRotation > 125) {
+		if (gunRotation < 25 || gunRotation > 155) {
 			batch.draw(playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
-			batch.draw(gunImg, gunPos.x, gunPos.y, .1f, .1f, gunRotation, false, flip);
+			batch.draw(gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
 		} else {
-			batch.draw(gunImg, gunPos.x, gunPos.y, .1f, .1f, gunRotation, false, flip);
+			batch.draw(gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
 			batch.draw(playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
 		}
 	}
