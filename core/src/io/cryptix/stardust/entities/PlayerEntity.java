@@ -78,11 +78,15 @@ public class PlayerEntity extends Entity {
 	@Override
 	public void render(GameRenderer batch) {
 		if (gunRotation < 25 || gunRotation > 155) {
+			batch.setColor(.4f, .8f, .4f, 1f);
 			batch.draw(playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
+			batch.setColor(1f, 1f, 1f, 1f);
 			batch.draw(gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
 		} else {
 			batch.draw(gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
+			batch.setColor(.4f, .8f, .4f, 1f);
 			batch.draw(playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
+			batch.setColor(1f, 1f, 1f, 1f);
 		}
 	}
 	
