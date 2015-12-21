@@ -1,5 +1,6 @@
 package io.cryptix.stardust.entities;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -78,13 +79,13 @@ public class PlayerEntity extends Entity {
 	@Override
 	public void render(GameRenderer batch) {
 		if (gunRotation < 25 || gunRotation > 155) {
-			batch.setColor(.4f, .8f, .4f, 1f);
+			//batch.setColor(Color.BLUE);
 			batch.draw(playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
 			batch.setColor(1f, 1f, 1f, 1f);
 			batch.draw(gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
 		} else {
 			batch.draw(gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
-			batch.setColor(.4f, .8f, .4f, 1f);
+			//batch.setColor(Color.CORAL);
 			batch.draw(playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
 			batch.setColor(1f, 1f, 1f, 1f);
 		}
