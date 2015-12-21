@@ -59,7 +59,7 @@ public class PlayerEntity extends Entity {
 	}
 	
 	public void calculateGunRotation(Vector2 mouse) {
-		gunRotation = (float) MathUtils.atan2(mouse.y - (gunPos.y + .3f), mouse.x - (gunPos.x - .9f)) * MathUtils.radiansToDegrees;
+		gunRotation = (float) MathUtils.atan2(mouse.y - (gunPos.y + .2f), mouse.x - (gunPos.x - .9f)) * MathUtils.radiansToDegrees;
 		if (gunRotation < 0) gunRotation += 360;
 	}
 	
