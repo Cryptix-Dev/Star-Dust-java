@@ -19,6 +19,7 @@ public class PlayerEntity extends Entity {
 	
 	private Body body;
 	private Texture playerImg;
+	private Texture maskImg;
 	
 	private Texture gunImg;
 	private Vector2 gunPos = new Vector2();
@@ -34,6 +35,7 @@ public class PlayerEntity extends Entity {
 		
 		playerImg = new Texture("main_character.png");
 		gunImg = new Texture("gun.png");
+		maskImg = new Texture("face_mask.png");
 		
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type  = BodyType.DynamicBody;
@@ -79,14 +81,16 @@ public class PlayerEntity extends Entity {
 	@Override
 	public void render(GameRenderer batch) {
 		if (gunRotation < 25 || gunRotation > 155) {
-			//batch.setColor(Color.BLUE);
 			batch.draw(playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
+			batch.setColor(Color.valueOf("F4D841"));
+			batch.draw(maskImg, this.getPosition().x - (flip ? .25f : -.25f), this.getPosition().y + .55f, this.getRotation(), flip, false);
 			batch.setColor(1f, 1f, 1f, 1f);
 			batch.draw(gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
 		} else {
 			batch.draw(gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
-			//batch.setColor(Color.CORAL);
 			batch.draw(playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
+			batch.setColor(Color.valueOf("F4D841"));
+			batch.draw(maskImg, this.getPosition().x - (flip ? .25f : -.25f), this.getPosition().y + .55f, this.getRotation(), flip, false);
 			batch.setColor(1f, 1f, 1f, 1f);
 		}
 	}
