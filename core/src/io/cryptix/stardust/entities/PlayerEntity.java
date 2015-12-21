@@ -31,7 +31,7 @@ public class PlayerEntity extends Entity {
 	public PlayerEntity(World world, Vector2 position) {
 		super(world, position, 0);
 		
-		playerImg = new Texture("main_character_blue_1.png");
+		playerImg = new Texture("main_character.png");
 		gunImg = new Texture("gun.png");
 		
 		BodyDef bodyDef = new BodyDef();
