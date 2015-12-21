@@ -10,6 +10,7 @@ public class DesktopLauncher {
 		config.title = "Star Dust";
 		config.width = 1280;
 		config.height = 720;
+		config.vSyncEnabled = true;
 		new LwjglApplication(new MainGame(), config);
 	}
 }
