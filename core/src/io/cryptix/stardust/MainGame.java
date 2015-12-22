@@ -59,14 +59,14 @@ public class MainGame extends ApplicationAdapter {
 			}
 		}
 		
-		doPhysicsStep(Gdx.graphics.getDeltaTime());
-		camera.setTarget(player.getPosition());
-		camera.update();
+		//doPhysicsStep(Gdx.graphics.getDeltaTime());
+		//camera.setTarget(player.getPosition());
+		//camera.update();
 	}
 	
 	@Override
 	public void render () {
-		
+		update();
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
@@ -77,7 +77,10 @@ public class MainGame extends ApplicationAdapter {
 		batch.end();
 		
 		debugRenderer.render(world, camera.getProjViewMatrix());
-		update();
+		
+		doPhysicsStep(Gdx.graphics.getDeltaTime());
+		camera.setTarget(player.getPosition());
+		camera.update();
 	}
 	
 	@Override
