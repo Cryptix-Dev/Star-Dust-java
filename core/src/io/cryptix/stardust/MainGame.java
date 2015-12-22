@@ -29,6 +29,8 @@ public class MainGame extends ApplicationAdapter {
 	
 	@Override
 	public void create () {
+		new Atlas();
+		
 		world = new World(new Vector2(0, 0f), true);
 		bodies = new Array<Body>();
 		debugRenderer = new Box2DDebugRenderer();

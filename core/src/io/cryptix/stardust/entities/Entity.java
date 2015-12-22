@@ -31,6 +31,8 @@ public abstract class Entity {
 		return angle;
 	}
 	
+	public abstract float drawPoint();
+	
 	public abstract Body getBody();
 	
 	public abstract void update();
