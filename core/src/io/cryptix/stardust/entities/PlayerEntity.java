@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -28,9 +29,8 @@ public class PlayerEntity extends Entity {
 	private float gunRotation = 0;
 	private boolean flip = false;
 	
-	private Vector2 lastMoveVel = Vector2.Zero;
-	private Vector2 direction = new Vector2();
 	private float velocity = 10f;
+	private Vector2 direction = new Vector2();
 	
 	private Animation walkAnimation;
 	private float stateTime;
@@ -53,7 +53,6 @@ public class PlayerEntity extends Entity {
 		FixtureDef fixture = new FixtureDef();
 		fixture.shape = shape;
 		fixture.density = 40f;
-		fixture.restitution = 0f;
 		body.createFixture(fixture);
 		shape.dispose();
 		
@@ -69,10 +68,15 @@ public class PlayerEntity extends Entity {
 	}
 	
 	public void movePlayer(float x, float y) {
-		//direction.add(x * velocity, y * velocity);
-		Vector2 move = new Vector2(x * velocity, y * velocity);
-		//System.out.println(direction);
-		body.setLinearVelocity(body.getLinearVelocity().add(move));
+		if (x == 0 && y == 0) {
+			direction = new Vector2(0, 0);		
+		} else {
+			direction.add(x, y);
+			if (direction.x != 0)
+				direction.x /= Math.abs(direction.x);
+			if (direction.y != 0)
+				direction.y /= Math.abs(direction.y);
+		}
 	}
 
 	@Override
@@ -80,10 +84,12 @@ public class PlayerEntity extends Entity {
 		gunPos = new Vector2(getPosition().x + .9f, getPosition().y - .3f);
 		if (gunRotation >= 90 && gunRotation <= 270) flip = true; else flip = false;
 		
-		// TODO: Check if can move.
-		//Vector2 moveVel = new Vector2(direction.x * velocity, direction.y * velocity); 
-		//body.setLinearVelocity(moveVel);
-		//lastMoveVel = moveVel;
+		if (Math.abs(direction.x) != Math.abs(direction.y) || (direction.x == 0 && direction.y == 0)) {
+			body.setLinearVelocity(direction.x * velocity, direction.y * velocity);
+		} else {
+			Vector2 temp = new Vector2(direction.x, direction.y).clamp(-1, 1);
+			body.setLinearVelocity(temp.x * velocity, temp.y * velocity);
+		}
 	}
 	
 	@Override
