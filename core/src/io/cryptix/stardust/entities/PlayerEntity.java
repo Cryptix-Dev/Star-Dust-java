@@ -1,7 +1,11 @@
 package io.cryptix.stardust.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -28,6 +32,10 @@ public class PlayerEntity extends Entity {
 	private Vector2 direction = new Vector2();
 	private float velocity = 10f;
 	
+	private Animation walkAnimation;
+	private float stateTime;
+	private TextureRegion currentFrame;
+	
 	public PlayerEntity(World world, Vector2 position) {
 		super(world, position, 0);
 		
@@ -50,6 +58,9 @@ public class PlayerEntity extends Entity {
 		shape.dispose();
 		
 		body.setUserData(this);
+		
+		walkAnimation = new Animation(0.05f, Atlas.walkFrames);
+		stateTime = 0f;
 	}
 	
 	public void calculateGunRotation(Vector2 mouse) {
@@ -95,6 +106,10 @@ public class PlayerEntity extends Entity {
 			batch.draw(Atlas.maskImg, this.getPosition().x - (flip ? .25f : -.25f), this.getPosition().y + .55f, this.getRotation(), flip, false);
 			batch.setColor(1f, 1f, 1f, 1f);
 		}
+		/*stateTime += Gdx.graphics.getDeltaTime();
+		currentFrame = walkAnimation.getKeyFrame(stateTime, true);
+		batch.draw(currentFrame, getPosition().x, getPosition().y, getRotation());
+		*/
 	}
 	
 	@Override
