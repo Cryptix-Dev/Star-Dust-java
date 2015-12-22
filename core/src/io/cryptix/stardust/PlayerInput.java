@@ -9,11 +9,15 @@ public class PlayerInput implements InputProcessor {
 	
 	private final MainGame game;
 	
+	private Vector2 mousePos;
+	
 	public PlayerInput(MainGame game) {
 		this.game = game;
+		mousePos = new Vector2();
 	}
 	
 	public void update() {
+		game.player.calculateGunRotation(game.camera.unproject(mousePos));
 	}
 	
 	public boolean keyPressed(int keycode) {
@@ -58,15 +62,19 @@ public class PlayerInput implements InputProcessor {
 		return false;
 	}
 	
+	public Vector2 getMousePosition() {
+		return mousePos;
+	}
+	
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
-		game.player.calculateGunRotation(game.camera.unproject(new Vector2(screenX, screenY)));
+		mousePos = new Vector2(screenX, screenY);
 		return true;
 	}
 	
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		game.player.calculateGunRotation(game.camera.unproject(new Vector2(screenX, screenY)));
+		mousePos = new Vector2(screenX, screenY);
 		return true;
 	}
 
