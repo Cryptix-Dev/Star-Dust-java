@@ -14,7 +14,7 @@ public class PlayerCamera {
 	private Camera camera;
 	
 	private float gameScale    = .03f;
-	private float lerp = 0.1f;
+	private float lerp 		   = 0.02f;
 	
 	private Vector3 targetPosition = new Vector3();
 	
