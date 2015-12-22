@@ -45,6 +45,7 @@ public class PlayerEntity extends Entity {
 		FixtureDef fixture = new FixtureDef();
 		fixture.shape = shape;
 		fixture.density = 40f;
+		fixture.restitution = 0f;
 		body.createFixture(fixture);
 		shape.dispose();
 		
@@ -57,7 +58,10 @@ public class PlayerEntity extends Entity {
 	}
 	
 	public void movePlayer(float x, float y) {
-		direction.add(x, y);
+		//direction.add(x * velocity, y * velocity);
+		Vector2 move = new Vector2(x * velocity, y * velocity);
+		//System.out.println(direction);
+		body.setLinearVelocity(body.getLinearVelocity().add(move));
 	}
 
 	@Override
@@ -66,9 +70,9 @@ public class PlayerEntity extends Entity {
 		if (gunRotation >= 90 && gunRotation <= 270) flip = true; else flip = false;
 		
 		// TODO: Check if can move.
-		Vector2 moveVel = new Vector2(direction.x * velocity, direction.y * velocity); 
-		body.setLinearVelocity(moveVel);
-		lastMoveVel = moveVel;
+		//Vector2 moveVel = new Vector2(direction.x * velocity, direction.y * velocity); 
+		//body.setLinearVelocity(moveVel);
+		//lastMoveVel = moveVel;
 	}
 	
 	@Override
