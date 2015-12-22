@@ -67,7 +67,7 @@ public class PlayerEntity extends Entity {
 		
 		// TODO: Check if can move.
 		Vector2 moveVel = new Vector2(direction.x * velocity, direction.y * velocity); 
-		body.setLinearVelocity(body.getLinearVelocity().add(moveVel).mulAdd(lastMoveVel, -1));
+		body.setLinearVelocity(moveVel);
 		lastMoveVel = moveVel;
 	}
 	
