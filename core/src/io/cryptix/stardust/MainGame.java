@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
+import io.cryptix.stardust.entities.BoxEntity;
 import io.cryptix.stardust.entities.Entity;
 import io.cryptix.stardust.entities.PlayerEntity;
 
@@ -23,6 +24,7 @@ public class MainGame extends ApplicationAdapter {
 	public float TIMESTEP = 1/300f;
 	
 	public PlayerEntity player;
+	private BoxEntity box;
 	
 	// TODO: Replace with smarter body management system. One for terrain, one for entities.
 	private Array<Body> bodies;
@@ -40,6 +42,7 @@ public class MainGame extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(new PlayerInput(this));
 		
 		player = new PlayerEntity(world, new Vector2(0, 0));
+		box = new BoxEntity(world, new Vector2(-4f, 0), 30f);
 	}
 	
 	public void update() {
@@ -70,6 +73,7 @@ public class MainGame extends ApplicationAdapter {
 		batch.setProjectionMatrix(camera.getProjViewMatrix());
 		batch.begin();
 		player.render(batch);
+		box.render(batch);
 		batch.end();
 		
 		debugRenderer.render(world, camera.getProjViewMatrix());
