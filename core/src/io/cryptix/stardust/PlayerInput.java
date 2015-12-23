@@ -7,17 +7,18 @@ import java.util.List;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class PlayerInput implements InputProcessor {
 	
 	private final MainGame game;
-	private final List<Integer> heldKeys;
+	private final Array<Integer> heldKeys;
 	
 	private Vector2 mousePos;
 	
 	public PlayerInput(MainGame game) {
 		this.game = game;
-		heldKeys = new ArrayList<Integer>();
+		heldKeys = new Array<Integer>();
 		mousePos = new Vector2();
 	}
 	
@@ -55,9 +56,9 @@ public class PlayerInput implements InputProcessor {
 
 	@Override
 	public boolean keyUp(int keycode) {
-		int index = heldKeys.indexOf(keycode);
+		int index = heldKeys.indexOf(keycode, true);
 		if (index != -1)
-			heldKeys.remove(index);
+			heldKeys.removeIndex(index);
 		
 		if (keycode == Keys.W) {
 			game.player.movePlayer(0, -1);
