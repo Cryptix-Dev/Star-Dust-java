@@ -56,9 +56,7 @@ public class PlayerInput implements InputProcessor {
 
 	@Override
 	public boolean keyUp(int keycode) {
-		int index = heldKeys.indexOf(keycode, true);
-		if (index != -1)
-			heldKeys.removeIndex(index);
+		heldKeys.removeValue(keycode, true);
 		
 		if (keycode == Keys.W) {
 			game.player.movePlayer(0, -1);
