@@ -11,7 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import io.cryptix.stardust.Atlas;
 import io.cryptix.stardust.GameRenderer;
-import io.cryptix.stardust.Util;
+import io.cryptix.stardust.utils.Util;
 
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 

@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+import io.cryptix.stardust.utils.Util;
+
 public class GameRenderer extends SpriteBatch {
 	
 	private boolean drawCenter;

@@ -1,4 +1,4 @@
-package io.cryptix.stardust;
+package io.cryptix.stardust.utils;
 
 import com.badlogic.gdx.math.Vector2;
 
