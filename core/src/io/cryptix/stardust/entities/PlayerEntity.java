@@ -1,18 +1,12 @@
 package io.cryptix.stardust.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import io.cryptix.stardust.Atlas;
@@ -22,8 +16,6 @@ import io.cryptix.stardust.Util;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class PlayerEntity extends Entity {
-	
-	private Body body;
 
 	private Vector2 gunPos = new Vector2();
 	private float gunRotation = 0;
@@ -36,30 +28,31 @@ public class PlayerEntity extends Entity {
 	private float stateTime;
 	private TextureRegion currentFrame;
 	
+	//private Color maskColor = Color.valueOf("F4D841");
+	private Color maskColor = Color.valueOf("DB4242");
+	
 	public PlayerEntity(World world, Vector2 position) {
 		super(world, position, 0);
-		
-		BodyDef bodyDef = new BodyDef();
-		bodyDef.type  = BodyType.DynamicBody;
-		bodyDef.position.set(position.x, position.y);
-		bodyDef.angle = 0;
-		bodyDef.fixedRotation = true;
-		body = world.createBody(bodyDef);
-		
-		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(Util.convertToMeters(Atlas.playerImg.getWidth())/2,
-					   Util.convertToMeters(Atlas.playerImg.getHeight())/2);
-		
-		FixtureDef fixture = new FixtureDef();
-		fixture.shape = shape;
-		fixture.density = 40f;
-		body.createFixture(fixture);
-		shape.dispose();
-		
-		body.setUserData(this);
-		
 		walkAnimation = new Animation(0.05f, Atlas.walkFrames);
 		stateTime = 0f;
+	}
+	
+	@Override
+	public BodyDef bodyDef() {
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type  = BodyType.DynamicBody;
+		bodyDef.position.set(this.getPosition());
+		bodyDef.angle = 0;
+		bodyDef.fixedRotation = true;
+		return bodyDef;
+	}
+
+	@Override
+	public FixtureDef[] fixtureDefs() {
+		FixtureDef[] output = new FixtureDef[1];
+		output[0] = new FixtureDef();
+		output[0].density = 40f;
+		return output;
 	}
 	
 	public void calculateGunRotation(Vector2 mouse) {
@@ -78,6 +71,12 @@ public class PlayerEntity extends Entity {
 				direction.y /= Math.abs(direction.y);
 		}
 	}
+	
+	@Override
+	public void initialize() { }
+
+	@Override
+	public void destroy() { }
 
 	@Override
 	public void update() {
@@ -85,30 +84,25 @@ public class PlayerEntity extends Entity {
 		if (gunRotation >= 90 && gunRotation <= 270) flip = true; else flip = false;
 		
 		if (Math.abs(direction.x) != Math.abs(direction.y) || (direction.x == 0 && direction.y == 0)) {
-			body.setLinearVelocity(direction.x * velocity, direction.y * velocity);
+			this.getBody().setLinearVelocity(direction.x * velocity, direction.y * velocity);
 		} else {
 			Vector2 temp = new Vector2(direction.x, direction.y).clamp(-1, 1);
-			body.setLinearVelocity(temp.x * velocity, temp.y * velocity);
+			this.getBody().setLinearVelocity(temp.x * velocity, temp.y * velocity);
 		}
-	}
-	
-	@Override
-	public float drawPoint() {
-		return this.getPosition().y - Util.convertToMeters(Atlas.playerImg.getHeight())/2;
 	}
 
 	@Override
 	public void render(GameRenderer batch) {
 		if (gunRotation < 25 || gunRotation > 155) {
 			batch.draw(Atlas.playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
-			batch.setColor(Color.valueOf("F4D841"));
+			batch.setColor(maskColor);
 			batch.draw(Atlas.maskImg, this.getPosition().x - (flip ? .25f : -.25f), this.getPosition().y + .55f, this.getRotation(), flip, false);
 			batch.setColor(1f, 1f, 1f, 1f);
 			batch.draw(Atlas.gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
 		} else {
 			batch.draw(Atlas.gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
 			batch.draw(Atlas.playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
-			batch.setColor(Color.valueOf("F4D841"));
+			batch.setColor(maskColor);
 			batch.draw(Atlas.maskImg, this.getPosition().x - (flip ? .25f : -.25f), this.getPosition().y + .55f, this.getRotation(), flip, false);
 			batch.setColor(1f, 1f, 1f, 1f);
 		}
@@ -119,8 +113,17 @@ public class PlayerEntity extends Entity {
 	}
 	
 	@Override
-	public Body getBody() {
-		return body;
+	public float drawPoint() {
+		return this.getPosition().y - Util.convertToMeters(Atlas.playerImg.getHeight())/2;
+	}
+	
+	@Override
+	public float width() {
+		return Util.convertToMeters(Atlas.playerImg.getWidth() - 2);
 	}
 
+	@Override
+	public float height() {
+		return Util.convertToMeters(Atlas.playerImg.getHeight() - 1);
+	}
 }

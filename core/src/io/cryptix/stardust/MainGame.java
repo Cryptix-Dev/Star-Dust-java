@@ -42,7 +42,10 @@ public class MainGame extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(new PlayerInput(this));
 		
 		player = new PlayerEntity(world, new Vector2(0, 0));
-		box = new BoxEntity(world, new Vector2(-4f, 0), 30f);
+		box = new BoxEntity(world, new Vector2(-4f, 0), 0);
+		
+		player.createBody();
+		box.createBody();
 	}
 	
 	public void update() {

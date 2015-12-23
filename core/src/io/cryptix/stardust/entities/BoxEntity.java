@@ -6,7 +6,9 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 
 import io.cryptix.stardust.Atlas;
 import io.cryptix.stardust.GameRenderer;
@@ -17,20 +19,23 @@ public class BoxEntity extends Entity {
 	
 	public BoxEntity(World world, Vector2 position, float angle) {
 		super(world, position, angle);
-		
+	}
+	
+	@Override
+	public BodyDef bodyDef() {
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.StaticBody;
-		bodyDef.position.set(position.x, position.y);
-		bodyDef.angle = angle * MathUtils.degreesToRadians;
-		body = world.createBody(bodyDef);
-		
+		bodyDef.position.set(this.getPosition());
+		bodyDef.angle = this.getRotation() * MathUtils.degreesToRadians;
+		return bodyDef;
+	}
+
+	@Override
+	public FixtureDef[] fixtureDefs() {
+		FixtureDef[] output = new FixtureDef[1];
 		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(1f, 1f);
-		body.createFixture(shape, 20f);
-		
-		shape.dispose();
-		
-		body.setUserData(this);
+		output[0] = new FixtureDef();
+		return output;
 	}
 	
 	@Override
@@ -44,13 +49,27 @@ public class BoxEntity extends Entity {
 	}
 
 	@Override
-	public void update() {
-		
-	}
+	public void update() { }
 
 	@Override
 	public void render(GameRenderer batch) {
 		batch.draw(Atlas.maskImg, this.getPosition().x, this.getPosition().y, this.getRotation());
 	}
+
+	@Override
+	public float width() {
+		return 8f;
+	}
+
+	@Override
+	public float height() {
+		return 8f;
+	}
+
+	@Override
+	public void initialize() { }
+
+	@Override
+	public void destroy() { }
 
 }
