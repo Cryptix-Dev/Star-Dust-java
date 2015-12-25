@@ -6,9 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
-
 import io.cryptix.stardust.Atlas;
 import io.cryptix.stardust.GameRenderer;
 import io.cryptix.stardust.utils.Util;
@@ -46,14 +43,6 @@ public class PlayerEntity extends Entity {
 		bodyDef.fixedRotation = true;
 		return bodyDef;
 	}
-
-	@Override
-	public FixtureDef[] fixtureDefs() {
-		FixtureDef[] output = new FixtureDef[1];
-		output[0] = new FixtureDef();
-		output[0].density = 40f;
-		return output;
-	}
 	
 	public void calculateGunRotation(Vector2 mouse) {
 		gunRotation = (float) MathUtils.atan2(mouse.y - (gunPos.y + .2f), mouse.x - (gunPos.x - .9f)) * MathUtils.radiansToDegrees;
@@ -71,9 +60,6 @@ public class PlayerEntity extends Entity {
 				direction.y /= Math.abs(direction.y);
 		}
 	}
-	
-	@Override
-	public void initialize() { }
 
 	@Override
 	public void destroy() { }
