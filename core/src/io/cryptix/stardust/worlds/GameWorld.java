@@ -153,6 +153,8 @@ public abstract class GameWorld {
 				gridCenter.x = gridCenter.x * 8 + 4;
 				gridCenter.y = gridCenter.y * 8 + 4;
 				Point relChunk = realToRelativeChunk((float)gridCenter.x / 128, (float)gridCenter.y / 128);
+				if (relChunk == null)
+					continue;
 				if (this.activeChunks.containsKey(relChunk)) {
 					this.grids[x][y] = this.activeChunks.get(relChunk).getGrid(gridCenter);
 				} else {
@@ -201,28 +203,27 @@ public abstract class GameWorld {
 		entities.clear();
 		for (int x = 2; x < this.grids.length - 2; x++) {
 			for (int y = 2; y < this.grids[x].length - 2; y ++) {
-				if (this.grids[x][y].getEntities().length != 0) {
-					if (this.grids[x][y].isPhysicsEnabled()) {
-						for (Entity e : this.grids[x][y].getEntities()) {
-							Point oldGrid = getRealGrid(e.getPosition().x, e.getPosition().y);
-							e.setPosition(e.getBody().getPosition());
-							e.setRotation(e.getBody().getAngle() * MathUtils.radiansToDegrees);
-							e.update();
-							Point newGrid = getRealGrid(e.getPosition().x, e.getPosition().y);
-							if (!oldGrid.equals(newGrid)) {
-								Point direction = new Point(newGrid.x - oldGrid.x, newGrid.y - oldGrid.y);
-								this.grids[x][y].removeEntity(e);
-								if (x+direction.x > this.grids.length - 1 || y+direction.y > this.grids[x].length - 1) {
-									e.destroyBody();
-									e.destroy();
-								} else {
-									this.grids[x+direction.x][y+direction.y].addEntity(e);
-									if (direction.x < 0 || direction.y < 0) entities.add(e);
-								}
+				if (this.grids[x][y] != null && this.grids[x][y].getEntities().length != 0) {
+					for (Entity e : this.grids[x][y].getEntities()) {
+						Point oldGrid = getRealGrid(e.getPosition().x, e.getPosition().y);
+						e.setPosition(e.getBody().getPosition());
+						e.setRotation(e.getBody().getAngle() * MathUtils.radiansToDegrees);
+						e.update();
+						Point newGrid = getRealGrid(e.getPosition().x, e.getPosition().y);
+						if (!oldGrid.equals(newGrid)) {
+							Point direction = new Point(newGrid.x - oldGrid.x, newGrid.y - oldGrid.y);
+							this.grids[x][y].removeEntity(e);
+							if (x+direction.x > this.grids.length - 1 || y+direction.y > this.grids[x].length - 1 || 
+								this.grids[x+direction.x][y+direction.y] == null) {
+								e.destroyBody();
+								e.destroy();
+							} else {
+								this.grids[x+direction.x][y+direction.y].addEntity(e);
+								if (direction.x < 0 || direction.y < 0) entities.add(e);
 							}
 						}
-						entities.addAll(this.grids[x][y].getEntities());
 					}
+					entities.addAll(this.grids[x][y].getEntities());
 				}
 			}
 		}
