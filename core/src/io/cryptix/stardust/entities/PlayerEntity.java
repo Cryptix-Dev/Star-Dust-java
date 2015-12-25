@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import io.cryptix.stardust.Atlas;
 import io.cryptix.stardust.GameRenderer;
 import io.cryptix.stardust.utils.Util;
+import io.cryptix.stardust.worlds.GameWorld;
 
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
@@ -28,7 +29,7 @@ public class PlayerEntity extends Entity {
 	//private Color maskColor = Color.valueOf("F4D841");
 	private Color maskColor = Color.valueOf("DB4242");
 	
-	public PlayerEntity(World world, Vector2 position) {
+	public PlayerEntity(GameWorld world, Vector2 position) {
 		super(world, position, 0);
 		walkAnimation = new Animation(0.05f, Atlas.walkFrames);
 		stateTime = 0f;

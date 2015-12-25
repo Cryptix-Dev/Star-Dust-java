@@ -5,41 +5,36 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
-
-import io.cryptix.stardust.entities.Entity;
 import io.cryptix.stardust.entities.PlayerEntity;
+import io.cryptix.stardust.worlds.WorldManager;
 
 public class MainGame extends ApplicationAdapter {
 	private GameRenderer batch;
 	
+	
 	public PlayerCamera camera;
-	private World world;
 	
 	private Box2DDebugRenderer debugRenderer;
 	public float TIMESTEP = 1/300f;
 	
 	public PlayerEntity player;
 	
-	// TODO: Replace with smarter body management system. One for terrain, one for entities.
-	private Array<Body> bodies;
+	private WorldManager worldManager;
 	
 	@Override
 	public void create () {
 		new Atlas();
-		
-		world = new World(new Vector2(0, 0f), true);
-		bodies = new Array<Body>();
+
 		debugRenderer = new Box2DDebugRenderer();
 		
 		batch = new GameRenderer();	
 		camera = new PlayerCamera();
 		Gdx.input.setInputProcessor(new PlayerInput(this));
 		
-		player = new PlayerEntity(world, new Vector2(0, 0));
+		worldManager = new WorldManager(camera.getViewportSize());
+		
+		player = new PlayerEntity(worldManager.getActiveWorld(), new Vector2(0, 0));
 		
 		player.createBody();
 	}
@@ -47,16 +42,11 @@ public class MainGame extends ApplicationAdapter {
 	public void update() {
 		((PlayerInput)Gdx.input.getInputProcessor()).update();
 		
-		world.getBodies(bodies);
-		for (Body b : bodies) {
-			Entity e = (Entity)b.getUserData();
-			
-			if (e != null) {
-				e.setPosition(b.getPosition());
-				e.setRotation(MathUtils.radiansToDegrees * b.getAngle());
-				e.update();
-			}
-		}
+		player.setPosition(player.getBody().getPosition());
+		player.setRotation(MathUtils.radiansToDegrees * player.getBody().getAngle());
+		player.update();
+
+		worldManager.getActiveWorld().update(player.getPosition());
 		
 		camera.setTarget(player.getPosition());
 		camera.update();
@@ -72,7 +62,8 @@ public class MainGame extends ApplicationAdapter {
 		player.render(batch);
 		batch.end();
 		
-		debugRenderer.render(world, camera.getProjViewMatrix());
+		worldManager.getActiveWorld().render(batch, camera.getProjViewMatrix());
+		debugRenderer.render(worldManager.getPhysicsWorld(), camera.getProjViewMatrix());
 		
 		doPhysicsStep(Gdx.graphics.getDeltaTime());
 	}
@@ -80,7 +71,7 @@ public class MainGame extends ApplicationAdapter {
 	@Override
 	public void resize(int width, int height) {
 		camera.resize(width, height);
-		
+		worldManager.resize(camera.getViewportSize().x, camera.getViewportSize().y);
 	}
 	
 	private float accumulator = 0;
@@ -88,7 +79,7 @@ public class MainGame extends ApplicationAdapter {
 		float frameTime = Math.min(deltaTime, 0.25f);
 		accumulator += frameTime;
 		while (accumulator >= TIMESTEP) {
-			world.step(TIMESTEP, 6, 2);
+			worldManager.getPhysicsWorld().step(TIMESTEP, 6, 2);
 			update();
 			accumulator -= TIMESTEP;
 		}

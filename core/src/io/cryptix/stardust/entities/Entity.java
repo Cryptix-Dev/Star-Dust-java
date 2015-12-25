@@ -9,13 +9,12 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
-import com.badlogic.gdx.physics.box2d.World;
-
 import io.cryptix.stardust.GameRenderer;
+import io.cryptix.stardust.worlds.GameWorld;
 
 public abstract class Entity {
 	
-	private final World world;
+	private final GameWorld world;
 	
 	private Vector2 position;
 	private float angle;
@@ -23,7 +22,7 @@ public abstract class Entity {
 	private Body body;
 	private Fixture[] fixtures;
 	
-	public Entity(World world, Vector2 position, float angle) {
+	public Entity(GameWorld world, Vector2 position, float angle) {
 		this.world = world;
 		this.position = position;
 		this.angle = angle;
@@ -45,12 +44,12 @@ public abstract class Entity {
 		return angle;
 	}
 	
-	public World getWorld() {
+	public GameWorld getWorld() {
 		return this.world;
 	}
 	
 	public void createBody() {
-		this.body = this.world.createBody(this.bodyDef());
+		this.body = this.world.getPhysicsWorld().createBody(this.bodyDef());
 		this.body.setUserData(this);
 		this.createFixtures();
 	}
@@ -96,7 +95,7 @@ public abstract class Entity {
 	}
 	
 	public void destroyBody() {
-		this.world.destroyBody(this.body);
+		this.world.getPhysicsWorld().destroyBody(this.body);
 		this.body = null;
 	}
 	
