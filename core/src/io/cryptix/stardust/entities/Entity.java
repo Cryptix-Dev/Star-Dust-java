@@ -56,12 +56,16 @@ public abstract class Entity {
 	}
 	
 	public void createFixtures() {
-		FixtureDef[] fixtureDefs = this.fixtureDefs();
 		Shape[] shapes = this.fixtureShapes();
 		if (shapes == null) {
 			shapes = new Shape[1];
 			shapes[0] = new PolygonShape();
-			((PolygonShape)shapes[0]).setAsBox(width()/2, height()/2);
+			((PolygonShape)shapes[0]).setAsBox(this.width()/2, this.height()/2);
+		}
+		FixtureDef[] fixtureDefs = this.fixtureDefs();
+		if (fixtureDefs == null) {
+			fixtureDefs = new FixtureDef[1];
+			fixtureDefs[0] = new FixtureDef();
 		}
 		if (fixtureDefs.length != shapes.length && shapes != null)
 			new IllegalBlockSizeException("FixtureShapes must be same size as FixtureDefs");
@@ -96,22 +100,24 @@ public abstract class Entity {
 		this.body = null;
 	}
 	
+	public FixtureDef[] fixtureDefs() {
+		return null;
+	}
+	
 	public Shape[] fixtureShapes() {
 		return null;
 	}
 	
-	public abstract BodyDef bodyDef();
+	public float drawPoint() {
+		return this.getPosition().y;
+	}
 	
-	public abstract FixtureDef[] fixtureDefs();
+	public abstract BodyDef bodyDef();
 	
 	public abstract float width();
 	
 	public abstract float height();
-	
-	public abstract float drawPoint();
-	
-	public abstract void initialize();
-	
+		
 	public abstract void destroy();
 	
 	public abstract void update();
