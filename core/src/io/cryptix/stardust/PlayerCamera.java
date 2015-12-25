@@ -56,4 +56,8 @@ public class PlayerCamera {
 	public void resize(int width, int height) {
 		viewport.update(width, height);
 	}
+	
+	public Vector2 getViewportSize() {
+		return new Vector2(viewport.getWorldWidth(), viewport.getWorldHeight());
+	}
 }
