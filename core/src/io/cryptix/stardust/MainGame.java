@@ -42,8 +42,7 @@ public class MainGame extends ApplicationAdapter {
 	public void update() {
 		((PlayerInput)Gdx.input.getInputProcessor()).update();
 		
-		player.setPosition(player.getBody().getPosition());
-		player.setRotation(MathUtils.radiansToDegrees * player.getBody().getAngle());
+		player.updatePhysics();
 		player.update();
 
 		worldManager.getActiveWorld().update(player.getPosition());
