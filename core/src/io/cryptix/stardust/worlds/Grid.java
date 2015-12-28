@@ -2,7 +2,6 @@ package io.cryptix.stardust.worlds;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-
 import io.cryptix.stardust.entities.Entity;
 import io.cryptix.stardust.utils.Point;
 
@@ -13,13 +12,11 @@ public class Grid {
 	private Array<Entity> entities;
 	
 	private boolean physicsEnabled;
-	private boolean isSleeping;
 	
 	public Grid(Point center) {
 		this.center = center;
 		this.entities = new Array<Entity>();
 		this.physicsEnabled = false;
-		this.isSleeping = false;
 	}
 	
 	public void createPhysics() {
@@ -36,16 +33,6 @@ public class Grid {
 				e.destroyBody();
 		}
 		this.physicsEnabled = false;
-	}
-	
-	public void sleep() {
-		if (this.physicsEnabled) {
-			for (Entity e : entities) {
-				e.getBody().setAwake(this.isSleeping);
-				e.getBody().setActive(false);
-			}
-			this.isSleeping = !this.isSleeping;
-		}
 	}
 	
 	public boolean isPhysicsEnabled() {
