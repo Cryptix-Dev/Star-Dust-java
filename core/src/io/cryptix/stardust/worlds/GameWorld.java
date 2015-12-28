@@ -17,7 +17,6 @@ public abstract class GameWorld {
 	private final World physicsWorld;
 	private int screenWidth, screenHeight;
 	
-	//private Vector2[] screenCorners;
 	private Vector2 bottomLeft;
 	
 	private ArrayMap<Point, Chunk> activeChunks;
@@ -28,14 +27,10 @@ public abstract class GameWorld {
 	
 	private Array<Entity> entities;
 	private EntityComparator entityComparator;
-	
-	//private boolean once = false;
-	
+		
 	public GameWorld(int screenWidth, int screenHeight) {
 		this.physicsWorld = new World(new Vector2(0, 0), true);
 		this.resize(screenWidth, screenHeight);
-
-		//this.screenCorners = new Vector2[4];
 		
 		this.activeChunks = new ArrayMap<Point, Chunk>(false, 9);
 		this.newActiveChunks = new Array<Point>(false, 9);
@@ -94,57 +89,6 @@ public abstract class GameWorld {
 		return realToRelative(x, y, 16);
 	}
 	
-	/*int[] xOffsets = {-1,  0,  1,  1,  1,  0, -1, -1};
-	int[] yOffsets = {-1, -1, -1,  0,  1,  1,  1,  0};
-	private void updateChunks(Vector2 playerPosition) {
-		newActiveChunks.clear();
-		Point playerChunk = realToRelativeChunk(playerPosition.x / 128, playerPosition.y / 128);
-		if (playerChunk != null)
-			newActiveChunks.add(playerChunk);
-		
-		for (int i = 0; i < 4; i++) {
-			Point relativeGrid = realToRelativeGrid(screenCorners[i].x / 8, screenCorners[i].y / 8);
-			if (relativeGrid == null)
-				continue;
-			
-			Point cornerChunk = realToRelativeChunk(screenCorners[i].x / 128, screenCorners[i].y / 128);
-			if (cornerChunk == null)
-				continue;
-			if (!newActiveChunks.contains(cornerChunk, false))
-				newActiveChunks.add(cornerChunk);
-			
-			for (int j = 0; j < 8; j++) {
-				Point dist = new Point(((xOffsets[j] * 16 + 8) - relativeGrid.x)*((xOffsets[j] * 16 + 8) - relativeGrid.x),
-						   			  ((yOffsets[j] * 16 + 8) - relativeGrid.y)*((yOffsets[j] * 16 + 8) - relativeGrid.y));
-				if ((xOffsets[j] != 0 && yOffsets[j] == 0 && dist.x <= 100) ||
-					(yOffsets[j] != 0 && xOffsets[j] == 0 &&dist.y <= 100) ||
-					(xOffsets[j] != 0 && yOffsets[j] != 0 && (dist.x + dist.y) <= 100)) {
-					Point offsetChunk = realToRelativeChunk((screenCorners[i].x / 128) + xOffsets[j], (screenCorners[i].y / 128) + yOffsets[j]);
-					if (offsetChunk == null)
-						continue;
-					if (!newActiveChunks.contains(offsetChunk, false))
-						newActiveChunks.add(offsetChunk);
-				}
-			}
-		}
-		
-		Iterator<Entry<Point,Chunk>> itr = this.activeChunks.iterator();
-		while (itr.hasNext()) {
-			Entry<Point,Chunk> item = itr.next();
-			int index = newActiveChunks.indexOf(item.key, false);
-			if (index == -1) {
-				item.value.destroy();
-				itr.remove();
-			} else {
-				newActiveChunks.removeIndex(index);
-			}
-		}
-
-		for (Point p : newActiveChunks)
-			activeChunks.put(p, this.generateChunk(p.x, p.y));
-	}
-	*/
-	
 	private void createGrids(Vector2 playerPosition) {
 		this.activeChunks.clear();
 		for (int x = 0; x < this.grids.length; x++) {
@@ -182,6 +126,7 @@ public abstract class GameWorld {
 	
 	public void update(Vector2 playerPosition) {
 		Point currentGrid  = getRealGrid(playerPosition.x, playerPosition.y);
+		this.bottomLeft = new Vector2(playerPosition.x - (float)screenWidth/2 - 16, playerPosition.y - (float)screenHeight/2 - 16);
 		
 		if (this.playerGrid == null || !this.playerGrid.equals(currentGrid)) {
 			if (this.playerGrid == null) {
@@ -191,13 +136,7 @@ public abstract class GameWorld {
 				this.direction = new Point(currentGrid.x - this.playerGrid.x, currentGrid.y - this.playerGrid.y);
 				this.playerGrid = currentGrid;
 			}
-			this.bottomLeft = new Vector2(playerPosition.x - (float)screenWidth/2 - 16, playerPosition.y - (float)screenHeight/2 - 16);
 			updateGrids(playerPosition);
-			//this.screenCorners[0] = new Vector2(playerPosition.x - (float)screenWidth/2, playerPosition.y + (float)screenHeight/2);
-			//this.screenCorners[1] = new Vector2(playerPosition.x + (float)screenWidth/2, playerPosition.y + (float)screenHeight/2);
-			//this.screenCorners[2] = new Vector2(playerPosition.x + (float)screenWidth/2, playerPosition.y - (float)screenHeight/2);
-			//this.screenCorners[3] = new Vector2(playerPosition.x - (float)screenWidth/2, playerPosition.y - (float)screenHeight/2);
-			//updateChunks(playerPosition);
 		}
 		
 		entities.clear();
@@ -206,8 +145,7 @@ public abstract class GameWorld {
 				if (this.grids[x][y] != null && this.grids[x][y].getEntities().length != 0) {
 					for (Entity e : this.grids[x][y].getEntities()) {
 						Point oldGrid = getRealGrid(e.getPosition().x, e.getPosition().y);
-						e.setPosition(e.getBody().getPosition());
-						e.setRotation(e.getBody().getAngle() * MathUtils.radiansToDegrees);
+						e.updatePhysics();
 						e.update();
 						Point newGrid = getRealGrid(e.getPosition().x, e.getPosition().y);
 						if (!oldGrid.equals(newGrid)) {
@@ -241,8 +179,11 @@ public abstract class GameWorld {
 				}
 			}
 		}
+		batch.setProjectionMatrix(matrix);
+		batch.begin();
 		for (Entity e : entities)
 			e.render(batch);
+		batch.end();
 	}
 	
 	public void destroy() { }

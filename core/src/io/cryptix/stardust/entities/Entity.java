@@ -2,9 +2,11 @@ package io.cryptix.stardust.entities;
 
 import javax.crypto.IllegalBlockSizeException;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -22,10 +24,16 @@ public abstract class Entity {
 	private Body body;
 	private Fixture[] fixtures;
 	
+	private Vector2 linearVelocity;
+	private float angularVelocity;
+	
 	public Entity(GameWorld world, Vector2 position, float angle) {
 		this.world = world;
 		this.position = position;
 		this.angle = angle;
+		
+		this.linearVelocity = null;
+		this.angularVelocity = 0f;
 	}
 	
 	public Vector2 getPosition() {
@@ -34,10 +42,21 @@ public abstract class Entity {
 	
 	public void setPosition(Vector2 position) {
 		this.position = position;
+		if (this.body != null)
+			this.body.setTransform(this.position, this.body.getAngle());
 	}
 	
 	public void setRotation(float newRot) {
 		angle = newRot;
+		if (this.body != null)
+			this.body.setTransform(this.body.getPosition(), this.angle * MathUtils.degreesToRadians);
+	}
+	
+	public void SetPositionAndRotation(Vector2 position, float rotation) {
+		this.position = position;
+		this.angle = rotation;
+		if (this.body != null)
+			this.body.setTransform(this.position, this.angle * MathUtils.degreesToRadians);
 	}
 	
 	public float getRotation() {
@@ -46,6 +65,11 @@ public abstract class Entity {
 	
 	public GameWorld getWorld() {
 		return this.world;
+	}
+	
+	public void storePhysics() {
+		this.linearVelocity = this.body.getLinearVelocity();
+		this.angularVelocity = this.body.getAngularVelocity();
 	}
 	
 	public void createBody() {
@@ -65,6 +89,7 @@ public abstract class Entity {
 		if (fixtureDefs == null) {
 			fixtureDefs = new FixtureDef[1];
 			fixtureDefs[0] = new FixtureDef();
+			fixtureDefs[0].density = this.mass();
 		}
 		if (fixtureDefs.length != shapes.length && shapes != null)
 			new IllegalBlockSizeException("FixtureShapes must be same size as FixtureDefs");
@@ -95,12 +120,38 @@ public abstract class Entity {
 	}
 	
 	public void destroyBody() {
+		this.storePhysics();
 		this.world.getPhysicsWorld().destroyBody(this.body);
 		this.body = null;
 	}
 	
 	public FixtureDef[] fixtureDefs() {
 		return null;
+	}
+	
+	public BodyDef bodyDef() {
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = this.bodyType();
+		bodyDef.position.set(getPosition());
+		bodyDef.angle = getRotation() * MathUtils.degreesToRadians;
+		bodyDef.linearDamping = 10f;
+		bodyDef.angularDamping = 10f;
+		bodyDef.fixedRotation = true;
+		
+		if (this.linearVelocity != null) {
+			bodyDef.linearVelocity.set(this.linearVelocity);
+			bodyDef.angularVelocity = this.angularVelocity;
+
+			this.linearVelocity = null;
+		}
+		
+		
+		this.bodyDefSettings(bodyDef);
+		return bodyDef;
+	}
+	
+	public void bodyDefSettings(BodyDef bodyDef) {
+		
 	}
 	
 	public Shape[] fixtureShapes() {
@@ -111,11 +162,20 @@ public abstract class Entity {
 		return this.getPosition().y;
 	}
 	
-	public abstract BodyDef bodyDef();
+	public void updatePhysics() {
+		if (this.body != null) {
+			this.position = this.body.getPosition();
+			this.angle = this.body.getAngle() * MathUtils.radiansToDegrees;
+		}
+	}
+	
+	public abstract BodyType bodyType();
 	
 	public abstract float width();
 	
 	public abstract float height();
+	
+	public abstract float mass();
 		
 	public abstract void destroy();
 	

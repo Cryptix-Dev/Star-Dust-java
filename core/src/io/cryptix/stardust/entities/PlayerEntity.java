@@ -5,7 +5,10 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
+
 import io.cryptix.stardust.Atlas;
 import io.cryptix.stardust.GameRenderer;
 import io.cryptix.stardust.utils.Util;
@@ -36,13 +39,30 @@ public class PlayerEntity extends Entity {
 	}
 	
 	@Override
-	public BodyDef bodyDef() {
-		BodyDef bodyDef = new BodyDef();
-		bodyDef.type  = BodyType.DynamicBody;
-		bodyDef.position.set(this.getPosition());
-		bodyDef.angle = 0;
-		bodyDef.fixedRotation = true;
-		return bodyDef;
+	public BodyType bodyType() {
+		return BodyType.DynamicBody;
+	}
+	
+	@Override
+	public Shape[] fixtureShapes() {
+		PolygonShape[] shapes = new PolygonShape[2];
+		shapes[0] = new PolygonShape();
+		shapes[0].setAsBox(this.width()/2, this.height()/2);
+		
+		shapes[1] = new PolygonShape();
+		shapes[1].setAsBox(this.width()/2.5f, .5f, new Vector2(0, -1), 0);
+		return shapes;
+	}
+	
+	@Override
+	public FixtureDef[] fixtureDefs() {
+		FixtureDef[] fixtures = new FixtureDef[2];
+		fixtures[0] = new FixtureDef();
+		fixtures[0].isSensor = true;
+		fixtures[0].density = this.mass();
+		
+		fixtures[1] = new FixtureDef();
+		return fixtures;
 	}
 	
 	public void calculateGunRotation(Vector2 mouse) {
@@ -112,5 +132,10 @@ public class PlayerEntity extends Entity {
 	@Override
 	public float height() {
 		return Util.convertToMeters(Atlas.playerImg.getHeight() - 1);
+	}
+	
+	@Override
+	public float mass() {
+		return 1f;
 	}
 }
