@@ -13,7 +13,7 @@ public class MainGame extends ApplicationAdapter {
 	private GameRenderer batch;
 	
 	
-	public PlayerCamera camera;
+	public GameCamera camera;
 	
 	private Box2DDebugRenderer debugRenderer;
 	public float TIMESTEP = 1/300f;

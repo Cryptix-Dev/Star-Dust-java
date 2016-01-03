@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class PlayerCamera {
+public class GameCamera {
 	
 	private Viewport viewport;
 	private Camera camera;
@@ -18,7 +18,7 @@ public class PlayerCamera {
 	
 	private Vector3 targetPosition = new Vector3();
 	
-	public PlayerCamera() {
+	public GameCamera() {
 		camera = new OrthographicCamera();
 		viewport = new ScreenViewport(camera);
 		((ScreenViewport)viewport).setUnitsPerPixel(gameScale);
