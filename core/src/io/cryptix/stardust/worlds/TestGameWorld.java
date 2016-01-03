@@ -32,4 +32,9 @@ public class TestGameWorld extends GameWorld {
 	public int size() {
 		return 10;
 	}
+
+	@Override
+	public Vector2 spawnLocation() {
+		return new Vector2(0, 0);
+	}
 }

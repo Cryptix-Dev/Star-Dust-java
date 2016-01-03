@@ -3,6 +3,7 @@ package io.cryptix.stardust.entities;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
+import io.cryptix.stardust.Atlas;
 import io.cryptix.stardust.GameRenderer;
 import io.cryptix.stardust.worlds.GameWorld;
 
@@ -31,6 +32,7 @@ public class TestEntity extends Entity {
 	public float mass() {
 		return 100;
 	}
+	
 	@Override
 	public void destroy() { }
 
@@ -38,6 +40,8 @@ public class TestEntity extends Entity {
 	public void update() { }
 
 	@Override
-	public void render(GameRenderer batch) { }
+	public void render(GameRenderer batch) {
+		batch.draw(Atlas.box, getPosition().x, getPosition().y + .8f);
+	}
 
 }

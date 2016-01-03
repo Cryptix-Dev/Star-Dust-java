@@ -3,6 +3,8 @@ package io.cryptix.stardust.worlds;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 
+import io.cryptix.stardust.entities.PlayerEntity;
+
 public class WorldManager {
 	
 	private GameWorld activeWorld;
@@ -22,7 +24,7 @@ public class WorldManager {
 		
 		if (loadWorld(index) == null) {
 			this.activeWorld = createWorld(index);
-		}
+		}		
 	}
 	
 	private GameWorld loadWorld(int index) {
@@ -41,6 +43,10 @@ public class WorldManager {
 	
 	public World getPhysicsWorld() {
 		return activeWorld.getPhysicsWorld();
+	}
+	
+	public PlayerEntity getPlayer() {
+		return this.activeWorld.getPlayer();
 	}
 	
 	public void resize(float viewWidth, float viewHeight) {

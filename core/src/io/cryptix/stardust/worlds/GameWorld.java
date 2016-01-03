@@ -1,20 +1,23 @@
 package io.cryptix.stardust.worlds;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import io.cryptix.stardust.GameRenderer;
 import io.cryptix.stardust.entities.Entity;
 import io.cryptix.stardust.entities.EntityComparator;
+import io.cryptix.stardust.entities.PlayerEntity;
 import io.cryptix.stardust.utils.Point;
 import io.cryptix.stardust.utils.Util;
 
 public abstract class GameWorld {
 	
 	private final World physicsWorld;
+	private final PlayerEntity player;
+	
 	private int screenWidth, screenHeight;
 	
 	private Vector2 bottomLeft;
@@ -30,8 +33,8 @@ public abstract class GameWorld {
 		
 	public GameWorld(int screenWidth, int screenHeight) {
 		this.physicsWorld = new World(new Vector2(0, 0), true);
-		this.resize(screenWidth, screenHeight);
-		
+		this.player = new PlayerEntity(this, spawnLocation());
+				
 		this.activeChunks = new ArrayMap<Point, Chunk>(false, 9);
 		this.newActiveChunks = new Array<Point>(false, 9);
 		this.playerGrid = null;
@@ -39,6 +42,12 @@ public abstract class GameWorld {
 		
 		this.entityComparator = new EntityComparator();
 		this.entities = new Array<Entity>();
+				
+		this.resize(screenWidth, screenHeight);
+	}
+	
+	public PlayerEntity getPlayer() {
+		return this.player;
 	}
 	
 	public World getPhysicsWorld() {
@@ -48,18 +57,8 @@ public abstract class GameWorld {
 	public void resize(int viewWidth, int viewHeight) {
 		this.screenWidth = viewWidth + 16;
 		this.screenHeight = viewHeight + 16;
-		
-		if (this.grids != null) {
-			for (int x = 0; x < this.grids.length; x++) {
-				for (int y = 0; y < this.grids[x].length; y ++) {
-					if (this.grids[x][y] != null)
-						this.grids[x][y].destroy();
-				}
-			}
-		}
-		
-		this.grids = new Grid[screenWidth/8 + 6][screenHeight/8 + 6];
-		this.playerGrid = null;
+		if (this.bottomLeft != null)
+			this.resizeGrids();
 	}
 	
 	public Point getRealGrid(float x, float y) {
@@ -89,8 +88,11 @@ public abstract class GameWorld {
 		return realToRelative(x, y, 16);
 	}
 	
-	private void createGrids(Vector2 playerPosition) {
+	private void resizeGrids() { }
+	
+	private void createGrids() {
 		this.activeChunks.clear();
+		this.grids = new Grid[screenWidth/8 + 6][screenHeight/8 + 6];
 		for (int x = 0; x < this.grids.length; x++) {
 			for (int y = 0; y < this.grids[x].length; y ++) {
 				Point gridCenter = getRealGrid(this.bottomLeft.x + x*8, this.bottomLeft.y + y*8);
@@ -107,58 +109,46 @@ public abstract class GameWorld {
 					this.activeChunks.put(relChunk, c);
 				}
 				
-				if (x != 0 && x != this.grids.length - 1 && y != 0 && y != this.grids[x].length - 1 &&
-					x != 1 && x != this.grids.length - 2 && y != 1 && y != this.grids[x].length - 2) {
+				if (x != 0 && x != this.grids.length - 1 && y != 0 && y != this.grids[x].length - 1) {
 					this.grids[x][y].createPhysics();
 				}
 			}
 		}
 	}
 	
-	private void updateGrids(Vector2 playerPosition) {
-		if (this.direction == null) {
-			createGrids(playerPosition);
-			return;
-		}
-		
-		
+	private void updateGrids() {
 	}
 	
-	public void update(Vector2 playerPosition) {
-		Point currentGrid  = getRealGrid(playerPosition.x, playerPosition.y);
-		this.bottomLeft = new Vector2(playerPosition.x - (float)screenWidth/2 - 16, playerPosition.y - (float)screenHeight/2 - 16);
+	public void update() {
 		
-		if (this.playerGrid == null || !this.playerGrid.equals(currentGrid)) {
-			if (this.playerGrid == null) {
-				this.playerGrid = currentGrid;
-				this.direction = null;
-			} else {
-				this.direction = new Point(currentGrid.x - this.playerGrid.x, currentGrid.y - this.playerGrid.y);
-				this.playerGrid = currentGrid;
-			}
-			updateGrids(playerPosition);
+		if (this.playerGrid == null) {
+			this.bottomLeft = new Vector2(this.player.getPosition().x - (float)screenWidth/2 - 16, this.player.getPosition().y - (float)screenHeight/2 - 16);
+			this.playerGrid = getRealGrid(this.player.getPosition().x, this.player.getPosition().y);
+			createGrids();
 		}
 		
 		entities.clear();
-		for (int x = 2; x < this.grids.length - 2; x++) {
-			for (int y = 2; y < this.grids[x].length - 2; y ++) {
-				if (this.grids[x][y] != null && this.grids[x][y].getEntities().length != 0) {
+		this.player.updatePhysics();
+		this.player.update();
+		entities.add(this.player);
+		for (int x = 1; x < this.grids.length - 1; x++) {
+			for (int y = 1; y < this.grids[x].length - 1; y ++) {
+				if (this.grids[x][y] != null) {
 					for (Entity e : this.grids[x][y].getEntities()) {
-						Point oldGrid = getRealGrid(e.getPosition().x, e.getPosition().y);
-						e.updatePhysics();
-						e.update();
-						Point newGrid = getRealGrid(e.getPosition().x, e.getPosition().y);
-						if (!oldGrid.equals(newGrid)) {
-							Point direction = new Point(newGrid.x - oldGrid.x, newGrid.y - oldGrid.y);
-							this.grids[x][y].removeEntity(e);
-							if (x+direction.x > this.grids.length - 1 || y+direction.y > this.grids[x].length - 1 || 
-								this.grids[x+direction.x][y+direction.y] == null) {
-								e.destroyBody();
-								e.destroy();
-							} else {
+						if (e.bodyType() != BodyType.StaticBody) {
+							Point oldGrid = getRealGrid(e.getPosition().x, e.getPosition().y);
+							e.updatePhysics();
+							e.update();
+							Point newGrid = getRealGrid(e.getPosition().x, e.getPosition().y);
+							if (!oldGrid.equals(newGrid)) {
+								Point direction = new Point(newGrid.x - oldGrid.x, newGrid.y - oldGrid.y);
+								this.grids[x][y].removeEntity(e);
 								this.grids[x+direction.x][y+direction.y].addEntity(e);
 								if (direction.x < 0 || direction.y < 0) entities.add(e);
 							}
+						} else {
+							e.updatePhysics();
+							e.update();
 						}
 					}
 					entities.addAll(this.grids[x][y].getEntities());
@@ -166,24 +156,36 @@ public abstract class GameWorld {
 			}
 		}
 		entities.sort(entityComparator);
+		
+		this.bottomLeft = new Vector2(this.player.getPosition().x - (float)screenWidth/2 - 16, this.player.getPosition().y - (float)screenHeight/2 - 16);
+		Point currentGrid  = getRealGrid(this.player.getPosition().x, this.player.getPosition().y);
+		
+		if (!this.playerGrid.equals(currentGrid)) {
+			this.direction = new Point(currentGrid.x - this.playerGrid.x, currentGrid.y - this.playerGrid.y);
+			this.playerGrid = currentGrid;
+			updateGrids();
+		}
+		
 	}
 	
 	public void render(GameRenderer batch, Matrix4 matrix) {
 		// TODO: Add ground render.
-		for (int x = 0; x < this.grids.length; x++) {
-			for (int y = 0; y < this.grids[x].length; y ++) {
-				if (this.grids[x][y] != null) {
-					Util.DrawSquare(new Vector2(this.grids[x][y].getPosition().x - 4, this.grids[x][y].getPosition().y - 4),
-							        new Vector2(this.grids[x][y].getPosition().x + 4, this.grids[x][y].getPosition().y + 4),
-							        matrix);
+		for (Entity e : entities)
+			e.render(batch);
+	}
+	
+	public void debugRender(GameRenderer batch, Matrix4 matrix) {
+		if (this.grids != null) {
+			for (int x = 0; x < this.grids.length; x++) {
+				for (int y = 0; y < this.grids[x].length; y ++) {
+					if (this.grids[x][y] != null) {
+						Util.DrawSquare(new Vector2(this.grids[x][y].getPosition().x - 4, this.grids[x][y].getPosition().y - 4),
+								        new Vector2(this.grids[x][y].getPosition().x + 4, this.grids[x][y].getPosition().y + 4),
+								        matrix);
+					}
 				}
 			}
 		}
-		batch.setProjectionMatrix(matrix);
-		batch.begin();
-		for (Entity e : entities)
-			e.render(batch);
-		batch.end();
 	}
 	
 	public void destroy() { }
@@ -195,4 +197,6 @@ public abstract class GameWorld {
 	public abstract boolean repeats();
 	
 	public abstract int size();
+	
+	public abstract Vector2 spawnLocation();
 }

@@ -36,6 +36,7 @@ public class PlayerEntity extends Entity {
 		super(world, position, 0);
 		walkAnimation = new Animation(0.05f, Atlas.walkFrames);
 		stateTime = 0f;
+		this.createBody();
 	}
 	
 	@Override

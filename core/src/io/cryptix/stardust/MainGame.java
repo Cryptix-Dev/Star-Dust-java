@@ -3,51 +3,39 @@ package io.cryptix.stardust;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import io.cryptix.stardust.entities.PlayerEntity;
 import io.cryptix.stardust.worlds.WorldManager;
 
 public class MainGame extends ApplicationAdapter {
 	private GameRenderer batch;
-	
-	
-	public GameCamera camera;
-	
+		
 	private Box2DDebugRenderer debugRenderer;
 	public float TIMESTEP = 1/300f;
-	
-	public PlayerEntity player;
-	
+		
+	private GameCamera camera;
 	private WorldManager worldManager;
 	
 	@Override
 	public void create () {
 		new Atlas();
-
-		debugRenderer = new Box2DDebugRenderer();
 		
-		batch = new GameRenderer();	
-		camera = new PlayerCamera();
-		Gdx.input.setInputProcessor(new PlayerInput(this));
+		batch = new GameRenderer();
+		camera = new GameCamera();
 		
 		worldManager = new WorldManager(camera.getViewportSize());
 		
-		player = new PlayerEntity(worldManager.getActiveWorld(), new Vector2(0, 0));
+		Gdx.input.setInputProcessor(new PlayerInput(worldManager, camera));
 		
-		player.createBody();
+		debugRenderer = new Box2DDebugRenderer();
+
 	}
 	
 	public void update() {
 		((PlayerInput)Gdx.input.getInputProcessor()).update();
-		
-		player.updatePhysics();
-		player.update();
 
-		worldManager.getActiveWorld().update(player.getPosition());
+		worldManager.getActiveWorld().update();
 		
-		camera.setTarget(player.getPosition());
+		camera.setTarget(worldManager.getActiveWorld().getPlayer().getPosition());
 		camera.update();
 	}
 	
@@ -58,13 +46,13 @@ public class MainGame extends ApplicationAdapter {
 		
 		batch.setProjectionMatrix(camera.getProjViewMatrix());
 		batch.begin();
-		player.render(batch);
+		worldManager.getActiveWorld().render(batch, camera.getProjViewMatrix());
 		batch.end();
 		
-		worldManager.getActiveWorld().render(batch, camera.getProjViewMatrix());
+		worldManager.getActiveWorld().debugRender(batch, camera.getProjViewMatrix());
 		debugRenderer.render(worldManager.getPhysicsWorld(), camera.getProjViewMatrix());
 		
-		doPhysicsStep(Gdx.graphics.getDeltaTime());
+		doPhysicsStep(Gdx.graphics.getDeltaTime());		
 	}
 	
 	@Override

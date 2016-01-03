@@ -9,15 +9,20 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import io.cryptix.stardust.worlds.WorldManager;
+
 public class PlayerInput implements InputProcessor {
 	
-	private final MainGame game;
-	private final Array<Integer> heldKeys;
+	private final WorldManager worldManager;
+	private final GameCamera camera;
 	
+	private final Array<Integer> heldKeys;
 	private Vector2 mousePos;
 	
-	public PlayerInput(MainGame game) {
-		this.game = game;
+	public PlayerInput(WorldManager worldManager, GameCamera camera) {
+		this.worldManager = worldManager;
+		this.camera = camera;
+		
 		heldKeys = new Array<Integer>();
 		mousePos = new Vector2();
 	}
@@ -26,8 +31,8 @@ public class PlayerInput implements InputProcessor {
 		for (int key : heldKeys) {
 			keyPressed(key);
 		}
-		
-		game.player.calculateGunRotation(game.camera.unproject(mousePos));
+		if (worldManager.getPlayer() != null)
+			worldManager.getPlayer().calculateGunRotation(camera.unproject(mousePos));
 	}
 	
 	public boolean keyPressed(int keycode) {
@@ -39,16 +44,16 @@ public class PlayerInput implements InputProcessor {
 		heldKeys.add(keycode);
 		
 		if (keycode == Keys.W) {
-			game.player.movePlayer(0, 1);
+			worldManager.getPlayer().movePlayer(0, 1);
 			return true;
 		} else if (keycode == Keys.S) {
-			game.player.movePlayer(0, -1);
+			worldManager.getPlayer().movePlayer(0, -1);
 			return true;
 		} else if (keycode == Keys.D) {
-			game.player.movePlayer(1, 0);
+			worldManager.getPlayer().movePlayer(1, 0);
 			return true;
 		} else if (keycode == Keys.A) {
-			game.player.movePlayer(-1, 0);
+			worldManager.getPlayer().movePlayer(-1, 0);
 			return true;
 		}		
 		return false;
@@ -59,16 +64,16 @@ public class PlayerInput implements InputProcessor {
 		heldKeys.removeValue(keycode, true);
 		
 		if (keycode == Keys.W) {
-			game.player.movePlayer(0, -1);
+			worldManager.getPlayer().movePlayer(0, -1);
 			return true;
 		} else if (keycode == Keys.S) {
-			game.player.movePlayer(0, 1);
+			worldManager.getPlayer().movePlayer(0, 1);
 			return true;
 		} else if (keycode == Keys.D) {
-			game.player.movePlayer(-1, 0);
+			worldManager.getPlayer().movePlayer(-1, 0);
 			return true;
 		} else if (keycode == Keys.A) {
-			game.player.movePlayer(1, 0);
+			worldManager.getPlayer().movePlayer(1, 0);
 			return true;
 		}
 		return false;

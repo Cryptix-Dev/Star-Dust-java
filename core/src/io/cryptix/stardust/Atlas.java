@@ -9,6 +9,7 @@ public class Atlas {
 	public static Texture playerImg;
 	public static Texture maskImg;
 	public static Texture gunImg;
+	public static Texture box;
 	
 	private static final int FRAME_COLS = 16;
 	private static final int FRAME_ROWS = 1;
@@ -24,6 +25,7 @@ public class Atlas {
 		playerImg = new Texture("main_character.png");
 		gunImg = new Texture("gun.png");
 		maskImg = new Texture("face_mask.png");
+		box = new Texture("box.png");
 		
 		walkSheet = new Texture(Gdx.files.internal("main_character_spritesheet.png"));
 		TextureRegion[][] tmp = TextureRegion.split(walkSheet, walkSheet.getWidth()/FRAME_COLS, walkSheet.getHeight()/FRAME_ROWS);
