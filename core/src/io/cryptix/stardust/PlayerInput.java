@@ -2,9 +2,6 @@ package io.cryptix.stardust;
 
 import com.badlogic.gdx.InputProcessor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
