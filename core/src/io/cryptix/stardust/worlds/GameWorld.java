@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ArrayMap;
 import io.cryptix.stardust.GameRenderer;
+import io.cryptix.stardust.entities.Drawable;
 import io.cryptix.stardust.entities.Entity;
 import io.cryptix.stardust.entities.EntityComparator;
 import io.cryptix.stardust.entities.PlayerEntity;
@@ -28,7 +29,7 @@ public abstract class GameWorld {
 	private Point direction;
 	private Grid[][] grids;
 	
-	private Array<Entity> entities;
+	private Array<Drawable> entities;
 	private EntityComparator entityComparator;
 		
 	public GameWorld(int screenWidth, int screenHeight) {
@@ -41,7 +42,7 @@ public abstract class GameWorld {
 		this.direction = null;
 		
 		this.entityComparator = new EntityComparator();
-		this.entities = new Array<Entity>();
+		this.entities = new Array<Drawable>();
 				
 		this.resize(screenWidth, screenHeight);
 	}
@@ -170,7 +171,7 @@ public abstract class GameWorld {
 	
 	public void render(GameRenderer batch, Matrix4 matrix) {
 		// TODO: Add ground render.
-		for (Entity e : entities)
+		for (Drawable e : entities)
 			e.render(batch);
 	}
 	

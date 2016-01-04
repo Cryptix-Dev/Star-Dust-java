@@ -14,7 +14,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import io.cryptix.stardust.GameRenderer;
 import io.cryptix.stardust.worlds.GameWorld;
 
-public abstract class Entity {
+public abstract class Entity implements Drawable {
 	
 	private final GameWorld world;
 	
@@ -158,6 +158,7 @@ public abstract class Entity {
 		return null;
 	}
 	
+	@Override
 	public float drawPoint() {
 		return this.getPosition().y;
 	}
@@ -181,5 +182,6 @@ public abstract class Entity {
 	
 	public abstract void update();
 	
+	@Override
 	public abstract void render(GameRenderer batch);
 }
