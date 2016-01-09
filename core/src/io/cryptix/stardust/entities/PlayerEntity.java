@@ -1,8 +1,8 @@
 package io.cryptix.stardust.entities;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+//import com.badlogic.gdx.graphics.g2d.Animation;
+//import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -18,24 +18,25 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class PlayerEntity extends Entity {
 
-	private Vector2 gunPos = new Vector2();
-	private float gunRotation = 0;
 	private boolean flip = false;
 	
 	private float velocity = 10f;
 	private Vector2 direction = new Vector2();
 	
-	private Animation walkAnimation;
-	private float stateTime;
-	private TextureRegion currentFrame;
+	private WeaponEntity heldWeapon;
+	
+	//private Animation walkAnimation;
+	//private float stateTime;
+	//private TextureRegion currentFrame;
 	
 	//private Color maskColor = Color.valueOf("F4D841");
 	private Color maskColor = Color.valueOf("DB4242");
 	
 	public PlayerEntity(GameWorld world, Vector2 position) {
 		super(world, position, 0);
-		walkAnimation = new Animation(0.05f, Atlas.walkFrames);
-		stateTime = 0f;
+		//walkAnimation = new Animation(0.05f, Atlas.walkFrames);
+		//stateTime = 0f;
+		heldWeapon = new WeaponEntity(world, this.getPosition(), 0);
 		this.createBody();
 	}
 	
@@ -67,8 +68,10 @@ public class PlayerEntity extends Entity {
 	}
 	
 	public void calculateGunRotation(Vector2 mouse) {
-		gunRotation = (float) MathUtils.atan2(mouse.y - (gunPos.y + .2f), mouse.x - (gunPos.x - .9f)) * MathUtils.radiansToDegrees;
-		if (gunRotation < 0) gunRotation += 360;
+		if(heldWeapon != null){
+			heldWeapon.setRotation((float) MathUtils.atan2(mouse.y - (heldWeapon.getPosition().y + .2f), mouse.x - (heldWeapon.getPosition().x - .9f)) * MathUtils.radiansToDegrees);
+			if ((heldWeapon.getRotation()) < 0) heldWeapon.setRotation(heldWeapon.getRotation() + 360);
+		}
 	}
 	
 	public void movePlayer(float x, float y) {
@@ -88,8 +91,12 @@ public class PlayerEntity extends Entity {
 
 	@Override
 	public void update() {
-		gunPos = new Vector2(getPosition().x + .9f, getPosition().y - .3f);
-		if (gunRotation >= 90 && gunRotation <= 270) flip = true; else flip = false;
+		if(heldWeapon != null){
+			heldWeapon.setPosition(new Vector2(getPosition().x + .9f, getPosition().y - .3f));
+			if (heldWeapon.getRotation() >= 90 && heldWeapon.getRotation() <= 270){
+				heldWeapon.setFlip(true);
+			}else heldWeapon.setFlip(false);
+		}
 		
 		if (Math.abs(direction.x) != Math.abs(direction.y) || (direction.x == 0 && direction.y == 0)) {
 			this.getBody().setLinearVelocity(direction.x * velocity, direction.y * velocity);
@@ -101,14 +108,14 @@ public class PlayerEntity extends Entity {
 
 	@Override
 	public void render(GameRenderer batch) {
-		if (gunRotation < 25 || gunRotation > 155) {
+		if (heldWeapon.getRotation() < 25 || heldWeapon.getRotation() > 155) {
 			batch.draw(Atlas.playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
 			batch.setColor(maskColor);
 			batch.draw(Atlas.maskImg, this.getPosition().x - (flip ? .25f : -.25f), this.getPosition().y + .55f, this.getRotation(), flip, false);
 			batch.setColor(1f, 1f, 1f, 1f);
-			batch.draw(Atlas.gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
+			heldWeapon.render(batch);
 		} else {
-			batch.draw(Atlas.gunImg, gunPos.x, gunPos.y, .1f, .3f, gunRotation, false, flip);
+			heldWeapon.render(batch);
 			batch.draw(Atlas.playerImg, this.getPosition().x, this.getPosition().y, this.getRotation(), flip, false);
 			batch.setColor(maskColor);
 			batch.draw(Atlas.maskImg, this.getPosition().x - (flip ? .25f : -.25f), this.getPosition().y + .55f, this.getRotation(), flip, false);
