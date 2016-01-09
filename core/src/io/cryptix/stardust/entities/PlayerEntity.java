@@ -37,6 +37,7 @@ public class PlayerEntity extends Entity {
 		//walkAnimation = new Animation(0.05f, Atlas.walkFrames);
 		//stateTime = 0f;
 		heldWeapon = new WeaponEntity(world, this.getPosition(), 0);
+		heldWeapon.setHeld(true);
 		this.createBody();
 	}
 	
