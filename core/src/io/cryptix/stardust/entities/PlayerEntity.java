@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import io.cryptix.stardust.Atlas;
 import io.cryptix.stardust.GameRenderer;
 import io.cryptix.stardust.utils.Util;
+import io.cryptix.stardust.weapons.Weapon;
 import io.cryptix.stardust.worlds.GameWorld;
 
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -23,7 +24,7 @@ public class PlayerEntity extends Entity {
 	private float velocity = 10f;
 	private Vector2 direction = new Vector2();
 	
-	private WeaponEntity heldWeapon;
+	private Weapon heldWeapon;
 	
 	//private Animation walkAnimation;
 	//private float stateTime;
@@ -36,8 +37,7 @@ public class PlayerEntity extends Entity {
 		super(world, position, 0);
 		//walkAnimation = new Animation(0.05f, Atlas.walkFrames);
 		//stateTime = 0f;
-		heldWeapon = new WeaponEntity(world, this.getPosition(), 0);
-		heldWeapon.setHeld(true);
+		heldWeapon = new Weapon(world, this.getPosition(), 0);
 		this.createBody();
 	}
 	

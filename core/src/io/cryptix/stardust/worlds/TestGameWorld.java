@@ -3,8 +3,8 @@ package io.cryptix.stardust.worlds;
 import com.badlogic.gdx.math.Vector2;
 
 import io.cryptix.stardust.entities.TestEntity;
-import io.cryptix.stardust.entities.WeaponEntity;
 import io.cryptix.stardust.utils.Point;
+import io.cryptix.stardust.weapons.Weapon;
 
 public class TestGameWorld extends GameWorld {
 
@@ -21,7 +21,7 @@ public class TestGameWorld extends GameWorld {
 	public Grid generateGrid(Point worldPosition) {
 		Grid g = new Grid(worldPosition);
 		g.placeEntity(new TestEntity(this, Vector2.Zero, 0), Vector2.Zero);
-		g.placeEntity(new WeaponEntity(this, Vector2.Zero, 0), Vector2.Zero);
+		g.placeEntity(new Weapon(this, Vector2.Zero, 0), Vector2.Zero);
 		return g;
 	}
 
